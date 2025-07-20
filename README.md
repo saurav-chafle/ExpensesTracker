@@ -46,6 +46,15 @@ This project is open-source and available under the [MIT License](LICENSE).
 
 ## Acknowledgments 🙏
 
+Output:-
+
+<img width="1920" height="1020" alt="image" src="https://github.com/user-attachments/assets/48455824-76e5-470e-a88d-f41c3e2c6e30" />
+<img width="1920" height="1020" alt="image" src="https://github.com/user-attachments/assets/50a60e7e-bab9-4044-b98c-f8af6b20819f" />
+<img width="1920" height="1020" alt="image" src="https://github.com/user-attachments/assets/7f48ffc9-c0a2-48f2-b25f-2149be9fff85" />
+
+
+
+
 - Thanks to the [Tailwind CSS](https://tailwindcss.com/) team for providing the utility-first CSS framework. 🧑‍💻
 - Special thanks to [Chart.js](https://www.chartjs.org/) for enabling the creation of interactive charts. 📊
 
