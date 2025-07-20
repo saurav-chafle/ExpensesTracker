@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Tracker - Colorful Modern</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            /* background: linear-gradient(135deg, #060606 0%, #0d0d0efd 100%); */
+            color: white;
+            
+        }
+         .glassmorphism {
+            background: rgba(44, 38, 38, 0.42); /* Transparent black overlay */
+            border-radius: 16px;
+            box-shadow: 0 4px 30px rgba(159, 157, 157, 0.05);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(248, 247, 247, 0.441);
+            /* color: rgba(255, 255, 255, 0.847); */
+        }
+          .expense-item {
+            transform: translateY(0);
+            opacity: 1;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+          }
+    
+          .expense-item.removed {
+            transform: translateY(-10px);
+            opacity: 0;
+            height: 0;
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+          }
+           .animate-fade-in {
+            animation: fade-in 0.5s ease-out forwards;
+            }
+            @keyframes fade-in {
+                from {
+                opacity: 0;
+                transform: translateY(10px);
+                }
+                to {
+                opacity: 1;
+                transform: translateY(0);
+                }
+            }
+    </style>
+</head>
+<body class="text-gray-700 bg-black">
+    <div class="container mx-auto px-4 sm:px-6 py-8 sm:py-10 bg-black">
+        <header class="mb-8 sm:mb-12 text-center animate-fade-in">
+            <h1 id="tracker-title" class="text-3xl sm:text-4xl font-bold mb-2 text-indigo-800"></h1>
+             <p class="text-gray-600 text-lg">Visualize your spending patterns.</p>
+        </header>
+
+        <section class="glassmorphism p-6 sm:p-8 mb-6 sm:mb-8 transition-shadow duration-300 hover:shadow-2xl animate-fade-in">
+            <h2 class="text-2xl font-semibold mb-4 sm:mb-6 text-indigo-700 text-center">Add New Expense</h2>
+            <div class="tracker-form grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+                <input type="text" id="description" placeholder="Expense Description"
+                       class="glassmorphism border rounded-md p-3 sm:p-4 w-full focus:outline-none focus:ring-2 focus:ring-indigo-300 text-white -500
+                       placeholder-grey-500 transition-shadow duration-200 hover:shadow-md">
+                <input type="number" id="amount" placeholder="Amount (₹)"
+                       class="glassmorphism border rounded-md p-3 sm:p-4 w-full focus:outline-none focus:ring-2 focus:ring-indigo-300 text-white placeholder-gray-500 transition-shadow duration-200 hover:shadow-md">
+                <input type="datetime-local" id="expense-time"
+                       class="glassmorphism border rounded-md p-3 sm:p-4 w-full focus:outline-none focus:ring-2 focus:ring-indigo-300 text-white-900 placeholder-gray-500 transition-shadow duration-200 hover:shadow-md">
+                <button onclick="addExpense()"
+                        class="bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-md p-3 sm:p-4 hover:from-indigo-600 hover:to-purple-600 transition-colors duration-200 col-span-full md:col-span-1 focus:outline-none focus:ring-2 focus:ring-indigo-400">
+                    Add Expense
+                </button>
+            </div>
+        </section>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+            <section class="glassmorphism p-6 sm:p-8 animate-fade-in transition-shadow duration-300 hover:shadow-2xl">
+                <h2 class="text-2xl font-semibold mb-4 sm:mb-6 text-indigo-700 text-center">Expense List</h2>
+                <div id="expense-list" class="space-y-3 sm:space-y-4 max-h-72 sm:max-h-80 overflow-y-auto"></div>
+                <div id="total-expense" class="mt-4 sm:mt-6 text-xl font-bold text-green-600"></div>
+            </section>
+
+            <section class="glassmorphism p-6 sm:p-8 animate-fade-in transition-shadow duration-300 hover:shadow-2xl">
+                <h2 class="text-2xl font-semibold mb-4 sm:mb-6 text-indigo-700 text-center">Expense Analytics</h2>
+                <canvas id="expense-chart"></canvas>
+            </section>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 mt-6 sm:mt-8">
+            <section class="glassmorphism p-6 sm:p-8 animate-fade-in transition-shadow duration-300 hover:shadow-2xl">
+                <h2 class="text-2xl font-semibold mb-4 sm:mb-6 text-indigo-700 text-center">Monthly Expenses</h2>
+                <button onclick="showMonthlyExpenses()"
+                        class="bg-gradient-to-r from-teal-500 to-green-500 text-white rounded-md p-3 sm:p-4 hover:from-teal-600 hover:to-green-600 transition-colors duration-200 mb-4 sm:mb-6 block mx-auto focus:outline-none focus:ring-2 focus:ring-teal-400">
+                    Show Monthly Summary
+                </button>
+                <div id="monthly-expense-list" class="space-y-3 sm:space-y-4"></div>
+            </section>
+
+            <section class="glassmorphism p-6 sm:p-8 animate-fade-in transition-shadow duration-300 hover:shadow-2xl">
+                <h2 class="text-2xl font-semibold mb-4 sm:mb-6 text-indigo-700 text-center">Detailed Monthly Expenses</h2>
+                <div class="flex items-center justify-center mb-4 sm:mb-6">
+                    <select id="month-select" class="glassmorphism border rounded-md p-3 sm:p-4 mr-2 sm:mr-3 focus:outline-none focus:ring-2 focus:ring-indigo-300 text-white-700 placeholder-gray-500 transition-shadow duration-200 hover:shadow-md">
+                        <option value="">Select Month</option>
+                        <option value="0">January</option>
+                        <option value="1">February</option>
+                        <option value="2">March</option>
+                        <option value="3">April</option>
+                        <option value="4">May</option>
+                        <option value="5">June</option>
+                        <option value="6">July</option>
+                        <option value="7">August</option>
+                        <option value="8">September</option>
+                        <option value="9">October</option>
+                        <option value="10">November</option>
+                        <option value="11">December</option>
+                    </select>
+                    <button onclick="showDetailedMonthlyExpenses()"
+                            class="bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-md p-3 sm:p-4 hover:from-indigo-600 hover:to-purple-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-400">
+                        Show Details
+                    </button>
+                </div>
+                <div id="detailed-monthly-expense-list" class="mt-4 space-y-2 sm:space-y-3 max-h-48 sm:max-h-60 overflow-y-auto"></div>
+            </section>
+        </div>
+
+        <footer class="mt-8 sm:mt-12 flex justify-center space-x-4 sm:space-x-6 animate-fade-in">
+            <button onclick="downloadData()"
+                    class="bg-gray-700 text-white rounded-md p-3 sm:p-4 hover:bg-gray-800 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-600">
+                Download CSV
+            </button>
+            <button onclick="downloadExcelData()"
+                    class="text-white rounded-md p-3 sm:p-4  border">
+                Download Excel
+            </button>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.full.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
